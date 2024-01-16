@@ -106,6 +106,7 @@ coDirs = coDirs.filter(function(midiDir){
 let totalCnt = 0
 let similarityList = []
 let sameKeySig = 0
+let sameKegSigCnt = 0
 let translational_coefficient_theme_list = []
 let translational_coefficient_var_list = []
 
@@ -153,6 +154,7 @@ coDirs.slice(0,1)
     console.log("tmpSongNumber", themePath)
   
     // Similarity calculation (by measure).
+    // Calculate key signature by measure too.
     if(varPoints.length > 0){
       // Calculate similarity score by regarding the theme as lookup and var as query.
       // Loop each measure of theme-var pair.
@@ -166,6 +168,17 @@ coDirs.slice(0,1)
           let tmpSimScore = FingerprintingSimilarityScore(slicedVar, slicedTheme)
           currentSimList.push(tmpSimScore)
         }
+        // Key signature estimate by measure:
+        const tmpPointsTheme = mu.farey_quantise(slicedTheme, quantSet, [0, 2])
+        const keySigTheme = mu.fifth_steps_mode(tmpPointsTheme, mu.krumhansl_and_kessler_key_profiles)
+        // console.log("keySigTheme:", keySigTheme)
+        const tmpPointsVar = mu.farey_quantise(slicedVar, quantSet, [0, 2])
+        const keySigVar = mu.fifth_steps_mode(tmpPointsVar, mu.krumhansl_and_kessler_key_profiles)
+        // console.log("keySigVar:", keySigVar)
+        if(keySigVar[0] === keySigTheme[0]){
+          sameKeySig ++
+        }
+        sameKegSigCnt ++
         
       }
       // console.log("currentSimList", currentSimList)
@@ -203,16 +216,16 @@ coDirs.slice(0,1)
       })
       console.log("**score_var", score_var/scores_harman_forward_var.length)
   
-      // Key signature estimation:
+      // // Key signature estimation of the whole piece:
       const trgPointsTheme = mu.farey_quantise(themePoints, quantSet, [0, 2])
-      const keySigTheme = mu.fifth_steps_mode(trgPointsTheme, mu.krumhansl_and_kessler_key_profiles)
-      // console.log("keySigTheme:", keySigTheme)
+      // const keySigTheme = mu.fifth_steps_mode(trgPointsTheme, mu.krumhansl_and_kessler_key_profiles)
+      // // console.log("keySigTheme:", keySigTheme)
       const trgPointsVar = mu.farey_quantise(varPoints, quantSet, [0, 2])
-      const keySigVar = mu.fifth_steps_mode(trgPointsVar, mu.krumhansl_and_kessler_key_profiles)
-      // console.log("keySigVar:", keySigVar)
-      if(keySigVar[0] === keySigTheme[0]){
-        sameKeySig ++
-      }
+      // const keySigVar = mu.fifth_steps_mode(trgPointsVar, mu.krumhansl_and_kessler_key_profiles)
+      // // console.log("keySigVar:", keySigVar)
+      // if(keySigVar[0] === keySigTheme[0]){
+      //   sameKeySig ++
+      // }
   
       // Translational Coefficient:
       const compTheme = an.note_point_set2comp_obj(trgPointsTheme, 
@@ -248,7 +261,7 @@ coDirs.slice(0,1)
 // console.log("similarityList", similarityList)
 console.log("mu.mean(similarityList)", mu.mean(similarityList))
 console.log("mu.std(similarityList)", mu.std(similarityList))
-console.log("Percentage of same key signature", sameKeySig/totalCnt)
+console.log("Percentage of same key signature", sameKeySig/sameKegSigCnt)
 
 console.log("mu.mean(translational_coefficient_theme_list):", mu.mean(translational_coefficient_theme_list))
 console.log("mu.std(translational_coefficient_theme_list):", mu.std(translational_coefficient_theme_list))
