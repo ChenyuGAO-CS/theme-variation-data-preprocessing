@@ -1,0 +1,33 @@
+# Dependency directories
+node_modules/
+in/
+out/
+originality/results/
+originality/original/
+pendular_diagram/public/src/midi/
+
+# OS
+.DS_Store
+
+# Audio
+*.mp3
+*.wav
+*.ogg
+*.mid
+*.midi
+
+# Images
+*.png
+
+# Data files maybe?
+# *.json
+*.dat
+package-lock.json
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
