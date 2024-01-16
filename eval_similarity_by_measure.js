@@ -130,10 +130,10 @@ coDirs.slice(0,1)
   // Read files in each Dir:
   let tmpFiles = fs.readdirSync(path.join(mainPath["rootVar"], coDir))
 
-  // COMMENT lines 117-120 when processing the whole dataset.
-  tmpFiles = tmpFiles.filter(function(midiDir){
-    return mainPath["midiDirs"].indexOf(midiDir) >= 0
-  })
+  // // COMMENT lines 117-120 when processing the whole dataset.
+  // tmpFiles = tmpFiles.filter(function(midiDir){
+  //   return mainPath["midiDirs"].indexOf(midiDir) >= 0
+  // })
 
   tmpFiles.forEach(function(tmpFile, jFile){
     console.log("tmpFile:", tmpFile)
@@ -167,19 +167,18 @@ coDirs.slice(0,1)
         if(slicedVar.length > 0 && slicedTheme.length > 0){
           let tmpSimScore = FingerprintingSimilarityScore(slicedVar, slicedTheme)
           currentSimList.push(tmpSimScore)
+          // Key signature estimate by measure:
+          const tmpPointsTheme = mu.farey_quantise(slicedTheme, quantSet, [0, 2])
+          const keySigTheme = mu.fifth_steps_mode(tmpPointsTheme, mu.krumhansl_and_kessler_key_profiles)
+          // console.log("keySigTheme:", keySigTheme)
+          const tmpPointsVar = mu.farey_quantise(slicedVar, quantSet, [0, 2])
+          const keySigVar = mu.fifth_steps_mode(tmpPointsVar, mu.krumhansl_and_kessler_key_profiles)
+          // console.log("keySigVar:", keySigVar)
+          if(keySigVar[0] === keySigTheme[0]){
+            sameKeySig ++
+          }
+          sameKegSigCnt ++
         }
-        // Key signature estimate by measure:
-        const tmpPointsTheme = mu.farey_quantise(slicedTheme, quantSet, [0, 2])
-        const keySigTheme = mu.fifth_steps_mode(tmpPointsTheme, mu.krumhansl_and_kessler_key_profiles)
-        // console.log("keySigTheme:", keySigTheme)
-        const tmpPointsVar = mu.farey_quantise(slicedVar, quantSet, [0, 2])
-        const keySigVar = mu.fifth_steps_mode(tmpPointsVar, mu.krumhansl_and_kessler_key_profiles)
-        // console.log("keySigVar:", keySigVar)
-        if(keySigVar[0] === keySigTheme[0]){
-          sameKeySig ++
-        }
-        sameKegSigCnt ++
-        
       }
       // console.log("currentSimList", currentSimList)
       let simScore = mu.mean(currentSimList)
