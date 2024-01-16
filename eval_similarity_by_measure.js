@@ -130,10 +130,10 @@ coDirs.slice(0,1)
   // Read files in each Dir:
   let tmpFiles = fs.readdirSync(path.join(mainPath["rootVar"], coDir))
 
-  // // COMMENT lines 117-120 when processing the whole dataset.
-  // tmpFiles = tmpFiles.filter(function(midiDir){
-  //   return mainPath["midiDirs"].indexOf(midiDir) >= 0
-  // })
+  // COMMENT lines 117-120 when processing the whole dataset.
+  tmpFiles = tmpFiles.filter(function(midiDir){
+    return mainPath["midiDirs"].indexOf(midiDir) >= 0
+  })
 
   tmpFiles.forEach(function(tmpFile, jFile){
     console.log("tmpFile:", tmpFile)
