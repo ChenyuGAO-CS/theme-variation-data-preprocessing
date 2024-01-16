@@ -1,0 +1,33 @@
+{
+  "name": "research-chenyu-gao",
+  "version": "0.0.0",
+  "description": "Exploring research topics at the start of the PhD",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:mew-york/research-chenyu-gao.git"
+  },
+  "keywords": [
+    "intelligence",
+    "artificial",
+    "music"
+  ],
+  "author": "Chenyu Gao and Tom Collins",
+  "license": "AGPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/mew-york/research-chenyu-gao/issues"
+  },
+  "dependencies": {
+    "@tonejs/midi": "^2.0.27",
+    "child_process": "^1.0.2",
+    "maia-features": "^0.0.7",
+    "maia-hash": "^0.0.24",
+    "maia-markov": "^0.0.72",
+    "maia-util": "^0.3.7",
+    "node-jsonl": "^0.1.0",
+    "nodeplotlib": "^0.6.5",
+    "plotly": "^1.0.6",
+    "request": "^2.88.2",
+    "seed-random": "^2.2.0",
+    "uuid": "^3.1.0"
+  }
+}
