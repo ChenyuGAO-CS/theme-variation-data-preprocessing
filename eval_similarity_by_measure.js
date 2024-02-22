@@ -130,7 +130,7 @@ let translational_coefficient_var_list = []
 // console.log("[**score_chordPoints]", score_theme/scores_harman_forward.length)
 
 
-coDirs
+coDirs.slice(0,1)
 .forEach(function(coDir, jDir){
   // Read files in each Dir:
   let tmpFiles = fs.readdirSync(path.join(mainPath["rootVar"], coDir))
