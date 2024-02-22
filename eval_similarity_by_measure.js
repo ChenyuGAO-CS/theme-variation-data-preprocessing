@@ -30,6 +30,11 @@ const mainPaths = {
     "rootVar": "/Users/gaochenyu/Chenyu\ Gao/MusicAI\ Research/Variation\ Generation/gen_ready_to_eval/pop909_full_vars/fastTransVar_pop909_ep10",
     "midiDirs": ["002_A_0_fastTransVar0.mid", "734_A_0_fastTransVar0.mid"],
   },
+  "pop909markov": {
+    "rootTheme": "/Users/gaochenyu/Chenyu\ Gao/MusicAI\ Research/Variation\ Generation/gen_ready_to_eval/909_theme_eval",
+    "rootVar": "/Users/gaochenyu/Chenyu\ Gao/MusicAI\ Research/Variation\ Generation/gen_ready_to_eval/pop909_full_vars/markov_909",
+    "midiDirs": ["002_A_0_markovVar.mid", "734_A_0_markovVar.mid"],
+  },
   "VGMIDItvAttn": {
     "rootTheme": "/Users/gaochenyu/Chenyu\ Gao/MusicAI\ Research/Variation\ Generation/gen_ready_to_eval/vgmidi_theme_eval",
     "rootVar": "/Users/gaochenyu/Chenyu\ Gao/MusicAI\ Research/Variation\ Generation/gen_ready_to_eval/VGMIDI_full_vars/tvAttnVar_vgmidi_ep10",
@@ -125,7 +130,7 @@ let translational_coefficient_var_list = []
 // console.log("[**score_chordPoints]", score_theme/scores_harman_forward.length)
 
 
-coDirs.slice(0,1)
+coDirs
 .forEach(function(coDir, jDir){
   // Read files in each Dir:
   let tmpFiles = fs.readdirSync(path.join(mainPath["rootVar"], coDir))
