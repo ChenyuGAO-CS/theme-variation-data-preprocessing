@@ -35,6 +35,11 @@ const mainPaths = {
     "rootVar": "/Users/gaochenyu/Chenyu\ Gao/MusicAI\ Research/Variation\ Generation/gen_ready_to_eval/pop909_full_vars/markov_909",
     "midiDirs": ["002_A_0_markovVar.mid", "734_A_0_markovVar.mid"],
   },
+  "pop909hu": {
+    "rootTheme": "/Users/gaochenyu/Chenyu\ Gao/MusicAI\ Research/Variation\ Generation/gen_ready_to_eval/909_theme_eval",
+    "rootVar": "/Users/gaochenyu/Chenyu\ Gao/MusicAI\ Research/Variation\ Generation/gen_ready_to_eval/909_var_hu",
+    "midiDirs": ["002_A_0_markovVar.mid", "734_A_0_markovVar.mid"],
+  },
   "VGMIDItvAttn": {
     "rootTheme": "/Users/gaochenyu/Chenyu\ Gao/MusicAI\ Research/Variation\ Generation/gen_ready_to_eval/vgmidi_theme_eval",
     "rootVar": "/Users/gaochenyu/Chenyu\ Gao/MusicAI\ Research/Variation\ Generation/gen_ready_to_eval/VGMIDI_full_vars/tvAttnVar_vgmidi_ep10",
