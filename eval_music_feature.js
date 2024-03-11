@@ -63,6 +63,21 @@ const mainPaths = {
         "rootVar": "/Users/gaochenyu/Chenyu\ Gao/MusicAI\ Research/Variation\ Generation/gen_ready_to_eval/VGMIDI_full_vars/fastTrans_vgmidi_ep10",
         "midiDirs": ["e0_real_Ace\ Attorney_Nintendo\ DS_Phoenix\ Wright\ Ace\ Attorney_Ace\ Attorney\ -\ Court\ Begins_A_0_fastTransVar0.mid", "e0_real_Pokemon_Nintendo\ 3DS_Pokemon\ X\ &\ Pokemon\ Y_Bicycle_A_0_fastTransVar0.mid"],
       },
+      "VGMIDImarkov": {
+        "rootTheme": "/Users/gaochenyu/Chenyu\ Gao/MusicAI\ Research/Variation\ Generation/gen_ready_to_eval/vgmidi_theme_eval",
+        "rootVar": "/Users/gaochenyu/Chenyu\ Gao/MusicAI\ Research/Variation\ Generation/gen_ready_to_eval/VGMIDI_full_vars/markov_vgmidi",
+        "midiDirs": ["e0_real_Ace\ Attorney_Nintendo\ DS_Phoenix\ Wright\ Ace\ Attorney_Ace\ Attorney\ -\ Court\ Begins_A_0_markovVar.mid", "e0_real_Pokemon_Nintendo\ 3DS_Pokemon\ X\ &\ Pokemon\ Y_Bicycle_A_0_markovVar.mid"],
+      },
+      "VGMIDIhu": {
+        "rootTheme": "/Users/gaochenyu/Chenyu\ Gao/MusicAI\ Research/Variation\ Generation/gen_ready_to_eval/vgmidi_theme_eval",
+        "rootVar": "/Users/gaochenyu/Chenyu\ Gao/MusicAI\ Research/Variation\ Generation/gen_ready_to_eval/vgmidi_var_hu",
+        "midiDirs": ["e0_real_Ace\ Attorney_Nintendo\ DS_Phoenix\ Wright\ Ace\ Attorney_Ace\ Attorney\ -\ Court\ Begins_A_1.mid", "e0_real_Pokemon_Nintendo\ 3DS_Pokemon\ X\ &\ Pokemon\ Y_Bicycle_A_1.mid"],
+      },
+      "VGMIDItheme": {
+        "rootTheme": "/Users/gaochenyu/Chenyu\ Gao/MusicAI\ Research/Variation\ Generation/gen_ready_to_eval/vgmidi_theme_eval",
+        "rootVar": "/Users/gaochenyu/Chenyu\ Gao/MusicAI\ Research/Variation\ Generation/gen_ready_to_eval/vgmidi_theme_eval",
+        "midiDirs": ["e0_real_Ace\ Attorney_Nintendo\ DS_Phoenix\ Wright\ Ace\ Attorney_Ace\ Attorney\ -\ Court\ Begins_A_1.mid", "e0_real_Pokemon_Nintendo\ 3DS_Pokemon\ X\ &\ Pokemon\ Y_Bicycle_A_1.mid"],
+      },
 }
 
 // Farey sequence

@@ -55,6 +55,16 @@ const mainPaths = {
     "rootVar": "/Users/gaochenyu/Chenyu\ Gao/MusicAI\ Research/Variation\ Generation/gen_ready_to_eval/VGMIDI_full_vars/fastTrans_vgmidi_ep10",
     "midiDirs": ["e0_real_Ace\ Attorney_Nintendo\ DS_Phoenix\ Wright\ Ace\ Attorney_Ace\ Attorney\ -\ Court\ Begins_A_0_fastTransVar0.mid", "e0_real_Pokemon_Nintendo\ 3DS_Pokemon\ X\ &\ Pokemon\ Y_Bicycle_A_0_fastTransVar0.mid"],
   },
+  "VGMIDImarkov": {
+    "rootTheme": "/Users/gaochenyu/Chenyu\ Gao/MusicAI\ Research/Variation\ Generation/gen_ready_to_eval/vgmidi_theme_eval",
+    "rootVar": "/Users/gaochenyu/Chenyu\ Gao/MusicAI\ Research/Variation\ Generation/gen_ready_to_eval/VGMIDI_full_vars/markov_vgmidi",
+    "midiDirs": ["e0_real_Ace\ Attorney_Nintendo\ DS_Phoenix\ Wright\ Ace\ Attorney_Ace\ Attorney\ -\ Court\ Begins_A_0_markovVar.mid", "e0_real_Pokemon_Nintendo\ 3DS_Pokemon\ X\ &\ Pokemon\ Y_Bicycle_A_0_markovVar.mid"],
+  },
+  "VGMIDIhu": {
+    "rootTheme": "/Users/gaochenyu/Chenyu\ Gao/MusicAI\ Research/Variation\ Generation/gen_ready_to_eval/vgmidi_theme_eval",
+    "rootVar": "/Users/gaochenyu/Chenyu\ Gao/MusicAI\ Research/Variation\ Generation/gen_ready_to_eval/vgmidi_var_hu",
+    "midiDirs": ["e0_real_Ace\ Attorney_Nintendo\ DS_Phoenix\ Wright\ Ace\ Attorney_Ace\ Attorney\ -\ Court\ Begins_A_1.mid", "e0_real_Pokemon_Nintendo\ 3DS_Pokemon\ X\ &\ Pokemon\ Y_Bicycle_A_1.mid"],
+  },
   // ...
 }
 
@@ -135,14 +145,17 @@ let translational_coefficient_var_list = []
 // console.log("[**score_chordPoints]", score_theme/scores_harman_forward.length)
 
 
-coDirs.slice(0,1)
+coDirs
 .forEach(function(coDir, jDir){
   // Read files in each Dir:
   let tmpFiles = fs.readdirSync(path.join(mainPath["rootVar"], coDir))
 
-  // COMMENT lines 117-120 when processing the whole dataset.
+  // // COMMENT lines 117-120 when processing the whole dataset.
+  // tmpFiles = tmpFiles.filter(function(midiDir){
+  //   return mainPath["midiDirs"].indexOf(midiDir) >= 0
+  // })
   tmpFiles = tmpFiles.filter(function(midiDir){
-    return mainPath["midiDirs"].indexOf(midiDir) >= 0
+    return midiDir != '.DS_Store'
   })
 
   tmpFiles.forEach(function(tmpFile, jFile){
@@ -158,6 +171,7 @@ coDirs.slice(0,1)
     for(let i = 1; i < splitVarName.length-1; i ++){
       tmpThemeName += ("_" + splitVarName[i])
     }
+    tmpThemeName += "_0" // For VGMIDImarkov, VGMIDIhu, and 909hu
     const themePath = path.join(mainPath["rootTheme"], tmpThemeName + '.mid')
     const themePoints = convertMIDItoPoints(themePath)
     console.log("themePoints: ", themePoints.slice(0,5))
