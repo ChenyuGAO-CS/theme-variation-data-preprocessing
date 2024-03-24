@@ -9,11 +9,11 @@ const path = require("path")
 
 // Individual user paths.
 const mainPaths = {
-    "23rdMar": {
-        "rootPath": "/Users/gaochenyu/Chenyu\ Gao/MusicAI\ Research/Variation\ Generation/Listening\ study/example\ survey\ data/23rdMarch_18responses",
-        "csvFileName": "Music\ Variation\ Generation\ Project_March 24,\ 2024_04.47.csv",
+    "24thMar": {
+        "rootPath": "/Users/gaochenyu/Chenyu\ Gao/MusicAI\ Research/Variation\ Generation/Listening\ study/example\ survey\ data/24thMarch_19responses",
+        "csvFileName": "Music\ Variation\ Generation\ Project_March\ 24,\ 2024_14.24.csv",
         "outRatingName": "processed_23Mar_listening_responses_rating.csv",
-        "outDemographicName": "processed_23Mar_listening_responses_demographic.csv",
+        "outDemographicName": "processed_23Mar_listening_responses_demographic.json",
       }
 }
 
@@ -33,7 +33,7 @@ function process_csv(data) {
     // console.log("data", data)
     let rows = new Array()
     rows = data.split("\r\n") // split by row
-    console.log(rows.length)
+    console.log("rows.length", rows.length)
     let ratingDic = {}
     let demographicDic = {}
 
@@ -94,8 +94,7 @@ function process_csv(data) {
                     tmp_response[tmp_new_rateID] = row[k]
                 }
                 ratingDic[tmp_themeID].push(tmp_response)
-                reatingStartFlag = 0
-                j = j + 40
+                j = j + 39
             }
             // console.log("ratingDic", ratingDic)
         }
@@ -105,11 +104,84 @@ function process_csv(data) {
       }
       parID = parID +1
     }
-    console.log("demographicDic", demographicDic)
-    console.log("ratingDic", ratingDic)
-  }
+    console.log("participant count:", parID)
+    // console.log("demographicDic", demographicDic)
+    // Write as JSON.
+    fs.writeFileSync(
+        path.join(mainPath['rootPath'], mainPath['outDemographicName']),
+        JSON.stringify(demographicDic, null, 2)
+    )
+    // console.log("ratingDic", ratingDic)
 
-  function phrase_row(row){
+    csv_rating = ratingDic_to_csv(ratingDic)
+    // Write csv file.
+    const out_rating_path = path.join(
+        mainPath['rootPath'], mainPath['outRatingName']
+    )
+    fs.writeFileSync(
+        out_rating_path,
+        csv_rating
+    )
+}
+
+function ratingDic_to_csv(ratingDic){
+    // Prepare Header of the .csv file
+    let headerItemList = ['themeID', 'parID']
+    let csvContent = 'themeID' + ', ' + 'parID' + ', ' 
+    for(let i = 1; i <=7; i ++){
+        csvContent += ('hu_rating_' + i.toString() + ', ')
+        headerItemList.push('hu_rating_' + i.toString())
+    }
+    // csvContent += ('hu_sug' + ', ')
+    // headerItemList.push('hu_sug')
+    for(let i = 1; i <=7; i ++){
+        csvContent += ('tv_rating_' + i.toString() + ', ')
+        headerItemList.push('tv_rating_' + i.toString())
+    }
+    // csvContent += ('tv_sug' + ', ')
+    // headerItemList.push('tv_sug')
+    for(let i = 1; i <=7; i ++){
+        csvContent += ('mt_rating_' + i.toString() + ', ')
+        headerItemList.push('mt_rating_' + i.toString())
+    }
+    // csvContent += ('mt_sug' + ', ')
+    // headerItemList.push('mt_sug')
+    for(let i = 1; i <=7; i ++){
+        csvContent += ('fa_rating_' + i.toString() + ', ')
+        headerItemList.push('fa_rating_' + i.toString())
+    }
+    // csvContent += ('fa_sug' + ', ')
+    // headerItemList.push('fa_sug')
+    for(let i = 1; i <=7; i ++){
+        csvContent += ('ma_rating_' + i.toString() + ', ')
+        headerItemList.push('ma_rating_' + i.toString())
+    }
+    // csvContent += ('ma_sug' + ', ')
+    csvContent += '\n'
+    // headerItemList.push('ma_sug')
+
+    // Prepare content by themeID
+    // console.log("headerItemList.length", headerItemList)
+    const themeIdList = Object.keys(ratingDic)
+    console.log("themeIdList", themeIdList)
+    for(keyID = 0; keyID < themeIdList.length; keyID ++){
+        const tmp_themeID = themeIdList[keyID]
+        const tmp_responses = ratingDic[tmp_themeID]
+        // console.log("tmp_responses", tmp_responses)
+        for(i = 0; i < tmp_responses.length; i ++){
+            csvContent += (tmp_themeID + ', ')
+            for(j = 1; j < headerItemList.length; j ++){
+                csvContent += (tmp_responses[i][headerItemList[j]] + ', ')
+            }
+            csvContent += '\n'
+        }
+    }
+    return csvContent
+
+}
+
+function phrase_row(row){
+    // console.log("***row", row)
     const tmp_row = row.split(",")
     let out_row = []
     for(let i = 0; i < tmp_row.length; i ++){
@@ -131,4 +203,4 @@ function process_csv(data) {
     }
     // console.log(out_row.length)
     return out_row
-  }
+}
