@@ -9,12 +9,18 @@ const path = require("path")
 
 // Individual user paths.
 const mainPaths = {
+    "26thMar": {
+        "rootPath": "/Users/gaochenyu/Chenyu\ Gao/MusicAI\ Research/Variation\ Generation/Listening\ study/example\ survey\ data/26thMarch_21responses",
+        "csvFileName": "Music\ Variation\ Generation\ Project_March\ 26,\ 2024_11.55.csv",
+        "outRatingName": "processed_26Mar_listening_responses_rating.csv",
+        "outDemographicName": "processed_26Mar_listening_responses_demographic.json",
+    },
     "24thMar": {
         "rootPath": "/Users/gaochenyu/Chenyu\ Gao/MusicAI\ Research/Variation\ Generation/Listening\ study/example\ survey\ data/24thMarch_19responses",
         "csvFileName": "Music\ Variation\ Generation\ Project_March\ 24,\ 2024_14.24.csv",
         "outRatingName": "processed_23Mar_listening_responses_rating.csv",
         "outDemographicName": "processed_23Mar_listening_responses_demographic.json",
-      }
+    }
 }
 
 // Grab user name from command line to set path to data.
