@@ -118,6 +118,10 @@ function process_csv(data) {
         JSON.stringify(demographicDic, null, 2)
     )
     // console.log("ratingDic", ratingDic)
+    fs.writeFileSync(
+        path.join(mainPath['rootPath'], 'responses_rating.json'),
+        JSON.stringify(ratingDic, null, 2)
+    )
 
     csv_rating = ratingDic_to_csv(ratingDic)
     // Write csv file.
