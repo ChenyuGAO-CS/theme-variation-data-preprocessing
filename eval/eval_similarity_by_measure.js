@@ -171,7 +171,7 @@ coDirs
     for(let i = 1; i < splitVarName.length-1; i ++){
       tmpThemeName += ("_" + splitVarName[i])
     }
-    tmpThemeName += "_0" // For VGMIDImarkov, VGMIDIhu, and 909hu
+    // tmpThemeName += "_0" // For VGMIDImarkov, VGMIDIhu, and 909hu
     const themePath = path.join(mainPath["rootTheme"], tmpThemeName + '.mid')
     const themePoints = convertMIDItoPoints(themePath)
     console.log("themePoints: ", themePoints.slice(0,5))
@@ -201,6 +201,33 @@ coDirs
           if(keySigVar[0] === keySigTheme[0]){
             sameKeySig ++
           }
+
+          // Translational Coefficient:
+          const compTheme = an.note_point_set2comp_obj(tmpPointsTheme, 
+            [{"barNo": 1, "topNo": 4, "bottomNo": 4, "ontime": 0}],
+            false, 
+            null,
+            0, 1, 2, 3, 4)
+          // console.log("comp", compTheme)
+          const compObjTheme = new mf.CompObj(compTheme)
+          const translational_coefficient_theme = compObjTheme.translational_coefficient()
+          // console.log("translational_coefficient_theme", translational_coefficient_theme)
+          // if(!isNaN(translational_coefficient_theme)){
+          //   translational_coefficient_theme_list.push(translational_coefficient_theme)
+          // }
+      
+          const compVar = an.note_point_set2comp_obj(tmpPointsVar, 
+            [{"barNo": 1, "topNo": 4, "bottomNo": 4, "ontime": 0}],
+            false, 
+            null,
+            0, 1, 2, 3, 4)
+          // console.log("comp", compTheme)
+          const compObjVar = new mf.CompObj(compVar)
+          const translational_coefficient_var = compObjVar.translational_coefficient()
+          if(!isNaN(translational_coefficient_var) && !isNaN(translational_coefficient_theme)){
+            translational_coefficient_var_list.push(Math.abs(translational_coefficient_theme - translational_coefficient_var))
+          }
+
           sameKegSigCnt ++
         }
       }
@@ -250,31 +277,31 @@ coDirs
       //   sameKeySig ++
       // }
   
-      // Translational Coefficient:
-      const compTheme = an.note_point_set2comp_obj(trgPointsTheme, 
-        [{"barNo": 1, "topNo": 4, "bottomNo": 4, "ontime": 0}],
-        false, 
-        null,
-        0, 1, 2, 3, 4)
-      // console.log("comp", compTheme)
-      const compObjTheme = new mf.CompObj(compTheme)
-      const translational_coefficient_theme = compObjTheme.translational_coefficient()
-      // console.log("translational_coefficient_theme", translational_coefficient_theme)
-      if(!isNaN(translational_coefficient_theme)){
-        translational_coefficient_theme_list.push(translational_coefficient_theme)
-      }
+      // // Translational Coefficient full piece:
+      // const compTheme = an.note_point_set2comp_obj(trgPointsTheme, 
+      //   [{"barNo": 1, "topNo": 4, "bottomNo": 4, "ontime": 0}],
+      //   false, 
+      //   null,
+      //   0, 1, 2, 3, 4)
+      // // console.log("comp", compTheme)
+      // const compObjTheme = new mf.CompObj(compTheme)
+      // const translational_coefficient_theme = compObjTheme.translational_coefficient()
+      // // console.log("translational_coefficient_theme", translational_coefficient_theme)
+      // if(!isNaN(translational_coefficient_theme)){
+      //   translational_coefficient_theme_list.push(translational_coefficient_theme)
+      // }
   
-      const compVar = an.note_point_set2comp_obj(trgPointsVar, 
-        [{"barNo": 1, "topNo": 4, "bottomNo": 4, "ontime": 0}],
-        false, 
-        null,
-        0, 1, 2, 3, 4)
-      // console.log("comp", compTheme)
-      const compObjVar = new mf.CompObj(compVar)
-      const translational_coefficient_var = compObjVar.translational_coefficient()
-      if(!isNaN(translational_coefficient_var)){
-        translational_coefficient_var_list.push(translational_coefficient_var)
-      }
+      // const compVar = an.note_point_set2comp_obj(trgPointsVar, 
+      //   [{"barNo": 1, "topNo": 4, "bottomNo": 4, "ontime": 0}],
+      //   false, 
+      //   null,
+      //   0, 1, 2, 3, 4)
+      // // console.log("comp", compTheme)
+      // const compObjVar = new mf.CompObj(compVar)
+      // const translational_coefficient_var = compObjVar.translational_coefficient()
+      // if(!isNaN(translational_coefficient_var)){
+      //   translational_coefficient_var_list.push(translational_coefficient_var)
+      // }
       
       totalCnt ++
     }
