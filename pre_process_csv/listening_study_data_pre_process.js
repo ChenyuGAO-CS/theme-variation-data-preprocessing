@@ -9,11 +9,12 @@ const path = require("path")
 
 // Individual user paths.
 const mainPaths = {
-    "26thMar": {
-        "rootPath": "/Users/gaochenyu/Chenyu\ Gao/MusicAI\ Research/Variation\ Generation/Listening\ study/example\ survey\ data/26thMarch_21responses",
-        "csvFileName": "Music\ Variation\ Generation\ Project_March\ 26,\ 2024_11.55.csv",
-        "outRatingName": "processed_26Mar_listening_responses_rating.csv",
-        "outDemographicName": "processed_26Mar_listening_responses_demographic.json",
+    "27thMar": {
+        "rootPath": "/Users/gaochenyu/Chenyu\ Gao/MusicAI\ Research/Variation\ Generation/Listening\ study/example\ survey\ data/27thMarch_23responses",
+        "csvFileName": "Music\ Variation\ Generation\ Project_March\ 27,\ 2024_04.12.csv",
+        "outRatingName": "processed_27Mar_listening_responses_rating.csv",
+        "outDemographicName": "processed_27Mar_listening_responses_demographic.json",
+        "outComments": "processed_27Mar_comments.json",
     },
     "24thMar": {
         "rootPath": "/Users/gaochenyu/Chenyu\ Gao/MusicAI\ Research/Variation\ Generation/Listening\ study/example\ survey\ data/24thMarch_19responses",
@@ -117,6 +118,12 @@ function process_csv(data) {
         path.join(mainPath['rootPath'], mainPath['outDemographicName']),
         JSON.stringify(demographicDic, null, 2)
     )
+    const sugDic = sug_from_ratingDic(ratingDic)
+    fs.writeFileSync(
+        path.join(mainPath['rootPath'], mainPath['outComments']),
+        JSON.stringify(sugDic, null, 2)
+    )
+
     // console.log("ratingDic", ratingDic)
     fs.writeFileSync(
         path.join(mainPath['rootPath'], 'responses_rating.json'),
@@ -132,6 +139,43 @@ function process_csv(data) {
         out_rating_path,
         csv_rating
     )
+}
+
+function sug_from_ratingDic(ratingDic){
+    let sug_Dic = {}
+    const themeIdList = Object.keys(ratingDic)
+    console.log("themeIdList", themeIdList)
+    for(keyID = 0; keyID < themeIdList.length; keyID ++){
+        const tmp_themeID = themeIdList[keyID]
+        sug_Dic[tmp_themeID] = {}
+        sug_Dic[tmp_themeID]['hu_sug'] = []
+        sug_Dic[tmp_themeID]['tv_sug'] = []
+        sug_Dic[tmp_themeID]['mt_sug'] = []
+        sug_Dic[tmp_themeID]['fa_sug'] = []
+        sug_Dic[tmp_themeID]['ma_sug'] = []
+        // const sug_list = ['hu_sug', 'tv_sug', 'mt_sug', 'fa_sug', 'ma_sug']
+        const tmp_responses = ratingDic[tmp_themeID]
+        // console.log("tmp_responses", tmp_responses)
+        for(i = 0; i < tmp_responses.length; i ++){
+            if (tmp_responses[i]["hu_sug"] !== ""){
+                sug_Dic[tmp_themeID]["hu_sug"].push({"parID": tmp_responses[i]["parID"], "hu_sug": tmp_responses[i]["hu_sug"]})
+            }
+            if (tmp_responses[i]["tv_sug"] !== ""){
+                sug_Dic[tmp_themeID]["tv_sug"].push({"parID": tmp_responses[i]["parID"], "tv_sug": tmp_responses[i]["tv_sug"]})
+            }
+            if (tmp_responses[i]["mt_sug"] !== ""){
+                sug_Dic[tmp_themeID]["mt_sug"].push({"parID": tmp_responses[i]["parID"], "mt_sug": tmp_responses[i]["mt_sug"]})
+            }
+            if (tmp_responses[i]["fa_sug"] !== ""){
+                sug_Dic[tmp_themeID]["fa_sug"].push({"parID": tmp_responses[i]["parID"], "fa_sug": tmp_responses[i]["fa_sug"]})
+            }
+            if (tmp_responses[i]["ma_sug"] !== ""){
+                sug_Dic[tmp_themeID]["ma_sug"].push({"parID": tmp_responses[i]["parID"], "ma_sug": tmp_responses[i]["ma_sug"]})
+            }
+                
+        }
+    }
+    return sug_Dic
 }
 
 function ratingDic_to_csv(ratingDic){
