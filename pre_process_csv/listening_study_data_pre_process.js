@@ -115,33 +115,45 @@ function process_csv(data) {
     }
     console.log("participant count:", parID)
     // console.log("demographicDic", demographicDic)
-    // Write as JSON.
-    fs.writeFileSync(
-        path.join(mainPath['rootPath'], mainPath['outDemographicName']),
-        JSON.stringify(demographicDic, null, 2)
-    )
-    const sugDic = sug_from_ratingDic(ratingDic)
-    fs.writeFileSync(
-        path.join(mainPath['rootPath'], mainPath['outComments']),
-        JSON.stringify(sugDic, null, 2)
-    )
+    // // Write as JSON.
+    // fs.writeFileSync(
+    //     path.join(mainPath['rootPath'], mainPath['outDemographicName']),
+    //     JSON.stringify(demographicDic, null, 2)
+    // )
+    // const sugDic = sug_from_ratingDic(ratingDic)
+    // fs.writeFileSync(
+    //     path.join(mainPath['rootPath'], mainPath['outComments']),
+    //     JSON.stringify(sugDic, null, 2)
+    // )
 
-    // console.log("ratingDic", ratingDic)
-    fs.writeFileSync(
-        path.join(mainPath['rootPath'], 'responses_rating.json'),
-        JSON.stringify(ratingDic, null, 2)
-    )
+    // // console.log("ratingDic", ratingDic)
+    // fs.writeFileSync(
+    //     path.join(mainPath['rootPath'], 'responses_rating.json'),
+    //     JSON.stringify(ratingDic, null, 2)
+    // )
 
-    csv_rating = ratingDic_to_csv(ratingDic)
+    // csv_rating = ratingDic_to_csv(ratingDic)
+    // // Write csv file.
+    // const out_rating_path = path.join(
+    //     mainPath['rootPath'], mainPath['outRatingName']
+    // )
+    // fs.writeFileSync(
+    //     out_rating_path,
+    //     csv_rating
+    // )
+
+    const csv_violin_plot = ratingDic_to_violinPlot_csv(ratingDic)
     // Write csv file.
-    const out_rating_path = path.join(
-        mainPath['rootPath'], mainPath['outRatingName']
+    const out_rating_violinPlot_path = path.join(
+        mainPath['rootPath'], 'all_violin_plot.csv'
     )
     fs.writeFileSync(
-        out_rating_path,
-        csv_rating
+        out_rating_violinPlot_path,
+        csv_violin_plot
     )
 }
+
+
 
 function sug_from_ratingDic(ratingDic){
     let sug_Dic = {}
@@ -230,6 +242,86 @@ function ratingDic_to_csv(ratingDic){
                 csvContent += (tmp_responses[i][headerItemList[j]] + ', ')
             }
             csvContent += '\n'
+        }
+    }
+    return csvContent
+
+}
+
+function ratingDic_to_violinPlot_csv(ratingDic){
+    // Prepare Header of the .csv file
+    let headerItemList = ['themeID']
+    let csvContent = 'ID' + ', ' + 'Rating' + ', ' + 'Algorithm' + ', ' + 'Aspect' + ', ' + 'Dataset'
+    const aspectList = {
+        '1': 'Vs', 
+        '2': 'Sc', 
+        '3': 'Si', 
+        '4': 'Cr', 
+        '5': 'Mq', 
+        '6': 'Ws', 
+        '7': 'Turing'
+    }
+    const algDic = {
+        'hu': "Hu",
+        'tv': "VaTr",
+        'mt': "MuTr",
+        'fa': "FaTr",
+        'ma': "MAMA",
+    }
+    const vgmidiIdList = [
+        '1',   '3',   '5',   '7',   '15',
+        '17',  '19',  '20',  '22',  '29',
+        '30',  '32',  '36',  '38',  '41',
+    ]
+    const pop909IdList = [
+        '115', '134', '252', '321', '368',
+        '497', '552', '595', '623', '704',
+        '734', '766', '866', '002', '052'
+    ]
+    for(let i = 1; i <=7; i ++){
+        headerItemList.push('hu_rating_' + i.toString())
+    }
+    for(let i = 1; i <=7; i ++){
+        headerItemList.push('tv_rating_' + i.toString())
+    }
+    for(let i = 1; i <=7; i ++){
+        headerItemList.push('mt_rating_' + i.toString())
+    }
+    for(let i = 1; i <=7; i ++){
+        headerItemList.push('fa_rating_' + i.toString())
+    }
+    for(let i = 1; i <=7; i ++){
+        headerItemList.push('ma_rating_' + i.toString())
+    }
+    csvContent += '\n'
+
+    // Prepare content by themeID
+    // console.log("headerItemList.length", headerItemList)
+    const themeIdList = Object.keys(ratingDic)
+    console.log("themeIdList", themeIdList)
+    let tmp_id = 1
+    for(keyID = 0; keyID < themeIdList.length; keyID ++){
+        const tmp_themeID = themeIdList[keyID]
+        const tmp_responses = ratingDic[tmp_themeID]
+        // console.log("tmp_responses", tmp_responses)
+        for(i = 0; i < tmp_responses.length; i ++){
+            for(j = 1; j < headerItemList.length; j ++){
+                const tmp_header = headerItemList[j].split('_')
+                let dataset = ''
+                if(vgmidiIdList.includes(tmp_themeID)){
+                    dataset = 'VGMIDI-TV'
+                }
+                if(pop909IdList.includes(tmp_themeID)){
+                    dataset = 'POP909-TV'
+                }
+                console.log('tmp_themeID', tmp_themeID)
+                console.log('dataset', dataset)
+                const tmp_rating = tmp_responses[i][headerItemList[j]]
+                const tmp_alg = algDic[tmp_header[0]]
+                const tmp_aspect = aspectList[tmp_header[2]]
+                csvContent += (tmp_id.toString() + ', ' + tmp_rating.toString()  + ', ' +  tmp_alg  + ', ' + tmp_aspect  + ', ' + dataset + '\n')
+                tmp_id ++
+            }
         }
     }
     return csvContent
