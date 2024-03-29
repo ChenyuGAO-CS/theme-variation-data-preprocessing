@@ -9,19 +9,21 @@ const path = require("path")
 
 // Individual user paths.
 const mainPaths = {
+    "29thMar": {
+        "rootPath": "/Users/gaochenyu/Chenyu\ Gao/MusicAI\ Research/Variation\ Generation/Listening\ study/example\ survey\ data/29thMar_25responses",
+        "csvFileName": "Music\ Variation\ Generation\ Project_March\ 28,\ 2024_16.45.csv",
+        "outRatingName": "processed_29Mar_listening_responses_rating.csv",
+        "outDemographicName": "processed_29Mar_listening_responses_demographic.json",
+        "outComments": "processed_29Mar_comments.json",
+    },
     "27thMar": {
-        "rootPath": "/Users/gaochenyu/Chenyu\ Gao/MusicAI\ Research/Variation\ Generation/Listening\ study/example\ survey\ data/27thMarch_23responses",
-        "csvFileName": "Music\ Variation\ Generation\ Project_March\ 27,\ 2024_04.12.csv",
+        "rootPath": "/Users/gaochenyu/Chenyu\ Gao/MusicAI\ Research/Variation\ Generation/Listening\ study/example\ survey\ data/28thMarch_24responses",
+        "csvFileName": "Music\ Variation\ Generation\ Project_March\ 27,\ 2024_10.27.csv",
         "outRatingName": "processed_27Mar_listening_responses_rating.csv",
         "outDemographicName": "processed_27Mar_listening_responses_demographic.json",
-        "outComments": "processed_27Mar_comments.json",
+        
     },
-    "24thMar": {
-        "rootPath": "/Users/gaochenyu/Chenyu\ Gao/MusicAI\ Research/Variation\ Generation/Listening\ study/example\ survey\ data/24thMarch_19responses",
-        "csvFileName": "Music\ Variation\ Generation\ Project_March\ 24,\ 2024_14.24.csv",
-        "outRatingName": "processed_23Mar_listening_responses_rating.csv",
-        "outDemographicName": "processed_23Mar_listening_responses_demographic.json",
-    }
+    
 }
 
 // Grab user name from command line to set path to data.
@@ -68,7 +70,7 @@ function process_csv(data) {
             // The key is parID.
             let tmp_demo = {}
             for(let k = j; k < row.length; k ++){
-                if(header[k] === 'Q681'){
+                if(header[k] === 'email'){
                     j = k
                     break
                 }
@@ -78,7 +80,7 @@ function process_csv(data) {
             }
             demographicDic[parID.toString()] = tmp_demo
         }
-        if(header[j] === 'Q681'){
+        if(header[j] === 'email'){
             // All data process finished! 'email'
             break
         }
