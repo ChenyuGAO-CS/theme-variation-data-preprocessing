@@ -101,3 +101,16 @@ This script `Cal_winSize_via_annotated_theme_var_fp_similarity.js` in the `Theme
 ## Evaluate the generation results with feature-based evaluation metrics
 
 Using the script `eval/eval_similarity_by_measure.js` to extract 3 musical features described in Sec. 5.3.
+
+
+## Citing this Work
+If you use our method or datasets in your research, please cite:
+```
+@inproceedings{gao2024variation,
+  title={{Variation Transformer}: New datasets, models, and comparative evaluation for symbolic music variation generation},
+  author={Chenyu Gao, Federico Reuben, and Tom Collins},
+  booktitle={the 25th International Society for Music Information Retrieval Conference},
+  year={2024}
+}
+```
+
