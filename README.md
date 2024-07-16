@@ -45,11 +45,14 @@ After running the theme-and-variation extraction algorithm, there are only 9 var
         * We calculating both fp(x, y) and fp(y, x) when an excerpt is retrieved from a different song to avoid the false positive issue (i.e., an excerpt is retrieved from a quite chordal/dense song, which does not sound perceptually similar to the query).
 
 
-    The usage of the script `fp_retrieve_variations_accross_wholePOP909.js` (in the `Theme_variation_extraction` folder) to retrieve variations from the whole POP909 dataset is shown below:
+    The usage of the script `fp_retrieve_variations_accross_wholePOP909.js` (in the `Theme_variation_extraction` folder) to retrieve variations from the whole POP909 dataset is shown below (    Please change [lines 26-38](https://github.com/ChenyuGAO-CS/theme-variation-data-preprocessing/blob/main/Theme_variation_extraction/fp_retrieve_variations_accross_wholePOP909.js#L26-L38) to config your path):
+
+   
 
     ```
     node fp_retrieve_variations_accross_wholePOP909.js -u chenyu
     ```
+
 Size of the theme-var dataset:
 
     - Train: [Number of TVar pair saved]: 2,609
@@ -73,7 +76,7 @@ As for the VGMIDI dataset, we infer there could be greater scope for new materia
         * Compared to popular music, we infer there could be greater scope for new material in variations in game music, so we reduce the similarity lower bound to 30 but keep the similarity upper bound as 70.95.
         * We only extract variations from the same song to avoid false-positive variations from different songs being discovered, due to game music tends to have a constant accompaniment, and some of them are chrodal/dense. 
 
-    The usage of the script `fp_retrieve_variations_accross_vgmidi.js` (in the `Theme_variation_extraction` folder) to retrieve variations from the whole VGMIDI dataset is shown below:
+    The usage of the script `fp_retrieve_variations_accross_vgmidi.js` (in the `Theme_variation_extraction` folder) to retrieve variations from the whole VGMIDI dataset is shown below (    Please change [lines 28-36](https://github.com/ChenyuGAO-CS/theme-variation-data-preprocessing/blob/main/Theme_variation_extraction/fp_retrieve_variations_accross_vgmidi.js#L28-L36) to config your path):
 
     ```
     node fp_retrieve_variations_accross_vgmidi.js -u vgmidi
