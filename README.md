@@ -38,6 +38,15 @@ After running the theme-and-variation extraction algorithm, there are only 9 var
 2. Download the repetition annotations through [this link](https://github.com/ChenyuGAO-CS/Variation-Transformer-Data-and-Model/blob/main/dataset/909_hier_gt.json).
 
 3. Build hashes over the full POP909 dataset by using the script `build_hash.js`.
+    
+    Prepare directories to store hash tables:
+    ```
+    mkdir -p out/hash_tables/909_hash_tables/fp
+    ```
+    Build hash tables:
+    ```
+    node build_hash.js -u chenyu
+    ```
 
 
 4. Extract variations:
