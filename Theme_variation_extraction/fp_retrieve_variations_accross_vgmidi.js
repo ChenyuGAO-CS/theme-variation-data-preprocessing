@@ -28,7 +28,9 @@ const mainPaths = {
   "vgmidi": {
     "compositionObjectDir": "/Users/gaochenyu/Dataset/vgmidi_clean/samples",
     "midiDirs": ["034.json", "035.json", "801.json", "802.json"],
-    "outputDir": "/Users/gaochenyu/Dataset/vgmidi_clean/variation_examples",
+    "outputDir": path.join(
+      __dirname, "..", "out", "/variation_examples"
+    ),
     // "fpDir": path.join(__dirname, "..", "out", "hash_tables", "vgmidi_hash_tables"),
     "trackName": "Piano"
   },
@@ -91,7 +93,7 @@ let coDirs = fs.readdirSync(mainPath["compositionObjectDir"])
 // Count the number of theme-variation pairs saved.
 let pair_cnt = 0
 
-coDirs
+coDirs.slice(3,4)
 .forEach(function(coDir, jDir){
   console.log("coDir:", coDir)
   
