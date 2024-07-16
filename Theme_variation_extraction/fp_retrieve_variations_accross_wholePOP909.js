@@ -25,12 +25,16 @@ const { Midi } = require('@tonejs/midi')
 const mainPaths = {
   "chenyu": {
     "hierAnnotationReferencePath": path.join(
-    __dirname, "..", "out", "tmp", "909_hier_gt.json"
+      __dirname, "..", "out", "tmp", "909_hier_gt.json"
     ),
     "compositionObjectDir": "/Users/gaochenyu/Dataset/POP909_with_structure_labels/with_tempo_909_co_with_hier_annotations",
     "midiDirs": ["034.json", "035.json", "801.json", "802.json"],
-    "outputDir": "/Users/gaochenyu/Dataset/POP909_with_structure_labels/theme_var_retrived_whole_dataset_samples",
-    "fpDir": path.join(__dirname, "..", "out", "hash_tables", "909_hash_tables"),
+    "outputDir": path.join(
+      __dirname, "..", "out/theme_var_retrived_whole_dataset_samples"
+    ),
+    "fpDir": path.join(
+      __dirname, "..", "out", "hash_tables", "909_hash_tables"
+    ),
     "trackName": "Piano"
   },
 }
