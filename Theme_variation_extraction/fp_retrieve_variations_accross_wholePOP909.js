@@ -1,10 +1,10 @@
-// Chenyu Gao 8/9/2023
+// Chenyu Gao 29/9/2023
 
-// Tom suggests using human annotations to define a query, 
-// but then using fingerprinting scores in some window (e.g., [0.4, 0.7]) 
-// to retrieve variations (either from same song, or across part or whole of dataset).
-// This script will retrive variations across whole of POP909 dataset.
-// The window is set as [0.4, 0.7].
+// This script integrate the `save_phrase_separately.js`, and `fp_retrieve_variations_accross_wholePOP909.js`.
+
+// The first occurrence of each repetitive pattern will be regarded as the theme.
+// Human annotations with similarity < maxSimilarity will be reserved as variations.
+// When retrieving other variations, we will reserve the pieces with fp score in the similarity window.
 
 // Before running this script, the 'mix_three_tracks.js' script is needed to be run first.
 // Takes MIDI as input, and save each song by phrases.
@@ -25,17 +25,16 @@ const { Midi } = require('@tonejs/midi')
 const mainPaths = {
   "chenyu": {
     "hierAnnotationReferencePath": path.join(
-      __dirname, "..", "out", "tmp", "909_hier_gt.json"
+    __dirname, "..", "out", "tmp", "909_hier_gt.json"
     ),
     "compositionObjectDir": "/Users/gaochenyu/Dataset/POP909_with_structure_labels/with_tempo_909_co_with_hier_annotations",
     "midiDirs": ["034.json", "035.json", "801.json", "802.json"],
     "outputDir": path.join(
       __dirname, "..", "out/theme_var_retrived_whole_dataset_samples"
     ),
-    "fpDir": path.join(
-      __dirname, "..", "out", "hash_tables", "909_hash_tables"
-    ),
-    "trackName": "Piano"
+    "fpDir": path.join(__dirname, "..", "out", "hash_tables", "909_hash_tables"),
+    "trackName": "Piano",
+    "testing_list": path.join(__dirname, "random_idList_for_testing.json")
   },
 }
 
@@ -73,6 +72,8 @@ const fingerprinting_param = {
   "minSimilarity": 70,
   "minUniqueHash": 5
 }
+
+// Parameters for the window size.
 const maxSimilarity = 70.95
 const minSimilarity = 53.03
 
@@ -89,21 +90,47 @@ coDirs = coDirs.filter(function(midiDir){
   return mainPath["midiDirs"].indexOf(midiDir) >= 0
 })
 
+// // Filter filenames for testing accoring to the testing list.
+// let songList = require(mainPath["testing_list"])
+// songList = songList.slice(0, 90)
+// coDirs = coDirs
+// .filter(function(subDir){
+//   let tmpSongNumber = subDir.split(".")[0]
+//   if(inArray(tmpSongNumber, songList)){
+//     return subDir
+//   }
+// })
+// console.log("coDirs.length", coDirs.length)
+
+// Filter filenames for training accoring to the testing list.
+let songList = require(mainPath["testing_list"])
+songList = songList.slice(0, 90)
+coDirs = coDirs
+.filter(function(subDir){
+  let tmpSongNumber = subDir.split(".")[0]
+  if(!inArray(tmpSongNumber, songList)){
+    return subDir
+  }
+})
+console.log("coDirs.length", coDirs.length)
+
 // name of songs whose time signature is 3/4.
 // It seems that 746 is 2/4.
-const song_with_34 = ['034', '062', '102', '107',
+const song_with_34 = ['034', '102', '107',
                       '152', '176', '203', '215',
                       '231', '254', '280', '307',
                       '369', '584', '592', '624',
                       '653', '654', '662', '744',
                       '749', '756', '770',
                       '799', '869', '872', '887']
-const song_with_24 = ['746']
+const song_with_24 = ['062', '746']
 
 // Count the number of theme-variation pairs saved.
 let pair_cnt = 0
+let cnt_from_diff_song = 0
+let list_with_var_diff_song = []
 
-coDirs.slice(3,4)
+coDirs.slice(2,3)
 .forEach(function(coDir, jDir){
   console.log("coDir:", coDir)
   
@@ -147,7 +174,7 @@ coDirs.slice(3,4)
   // Iteration over the 'rep_phrase' Obj.
   Object.keys(rep_phrase).forEach(function(k_phrase){
     if(rep_phrase[k_phrase] > 1 && k_phrase != 'X' && k_phrase != 'x'){
-      console.log("k_phrase", k_phrase)
+      // console.log("k_phrase", k_phrase)
       const tmp_phrase_name = k_phrase
       let tmp_phrase_count = 0
       let theme_pattern
@@ -157,54 +184,34 @@ coDirs.slice(3,4)
 
       // Extract the theme pattern, which is the first occurrence of a phrase.
       // Iteration over the phraseLable.
-      for(let i = 0; i < phraseLable.length; i ++){
-        if(phraseLable[i] === tmp_phrase_name && tmp_phrase_count === 0){
-          // Calculate start ontime.
-          const startBar = getStartBar(i, lengthArrag)
-          // console.log("startBar", startBar)
-          // console.log("ontimeDiff", ontimeDiff)
-          const tmp_start_ontime = (startBar - 1)*beatsPerBar
-          // console.log("tmp_start_ontime", tmp_start_ontime)
-          // Calculate end ontime.
-          const tmp_end_ontime = tmp_start_ontime + lengthArrag[i]*beatsPerBar
-          // console.log("tmp_end_ontime", tmp_end_ontime)
-          let tmp_pattern = slicePoints(points, tmp_start_ontime, tmp_end_ontime)[0]
-          // console.log("*****tmp_pattern:", tmp_pattern.slice(0,3))
-          // Align each phrases to star from ontime = 0.
-          // const beg_time = tmp_pattern[0][0]
-          tmp_pattern = tmp_pattern.map(function(pt){
-            return[pt[0] - tmp_start_ontime, pt[1], pt[2], pt[3], 0, pt[5]]
-          })
+      const theme_bpm = co.tempi[0].bpm
+      // TODO: Insert code to extract variations from the annotations,
+      //       and save variations whose similarity < maxSimilarity in pattern_to_be_saved.
+      pattern_to_be_saved = selectedAnnotatedVar(points, phraseLable, lengthArrag, tmp_phrase_name, theme_bpm, beatsPerBar)
+      theme_pattern = pattern_to_be_saved[0]["tmp_pattern"]
+      // tmp_phrase_count = pattern_to_be_saved.length()
+      // console.log(pattern_to_be_saved.length)
+      // console.log("theme_pattern", theme_pattern.slice(0,10))
+      // console.log("pattern_to_be_saved", pattern_to_be_saved[0]["tmp_pattern"].slice(0,10))
 
-          // // Calculate similarity between the current pattern and the P_0
-          // let sim_score = 100
-          // let flag_for_pattern_save = 0
-
-          // Found the theme_pattern
-          theme_pattern = tmp_pattern
-          const theme_bpm = co.tempi[0].bpm
-          pattern_to_be_saved.push({"tmp_pattern":theme_pattern, "tmp_bpm":theme_bpm})
-          tmp_phrase_count ++
-        } 
-      }
       // Run fingerprinting to extract all similar patterns.
-      retrivedOcc = ExtractAllOccurWholeDataset(theme_pattern, maxSimilarity, minSimilarity, tmpSongNumber)
-      console.log("retrivedOcc", retrivedOcc)
+      retrievedOcc = ExtractAllOccurWholeDataset(theme_pattern, maxSimilarity, minSimilarity, tmpSongNumber)
+      // console.log("retrievedOcc", retrievedOcc)
 
       const currentSongNum = tmpSongNumber.toString()
 
-      // Iteration over the all retriced occurrences.
-      // TODO: if the retrived pattern is in another song, 
+      // Iteration over the all retrieve occurrences.
+      // If the retrieved pattern is in another song, 
       //       load points form this song, and then do points slice.
-      for(let i = 0; i < retrivedOcc.length; i++){
+      for(let i = 0; i < retrievedOcc.length; i++){
         let flag_for_pattern_save = 0
-        const tmp_start_ontime = retrivedOcc[i].edge
+        const tmp_start_ontime = retrievedOcc[i].edge
         const tmp_end_ontime = tmp_start_ontime + theme_pattern[theme_pattern.length - 1][0]
 
-        // Check if the retrived pattern is from the same song:
+        // Check if the retrieved pattern is from the same song:
         let tmp_pattern
         let tmp_bpm
-        if(retrivedOcc[i].winningPiece === currentSongNum){
+        if(retrievedOcc[i].winningPiece === currentSongNum){
           tmp_pattern = slicePoints(points, tmp_start_ontime, tmp_end_ontime)[0]
           tmp_pattern = tmp_pattern.map(function(pt){
             return[pt[0] - tmp_start_ontime, pt[1], pt[2], pt[3], 0, pt[5]]
@@ -212,8 +219,8 @@ coDirs.slice(3,4)
           tmp_bpm = co.tempi[0].bpm
         }
         else{
-          const nameWinpiece = retrivedOcc[i].winningPiece 
-          // Load points according to 'retrivedOcc[i].winningPiece'
+          const nameWinpiece = retrievedOcc[i].winningPiece 
+          // Load points according to 'retrievedOcc[i].winningPiece'
           const coWinpiecePath = path.join(mainPath["compositionObjectDir"], nameWinpiece + '.json')
           const coWinpiece = require(coWinpiecePath)
           const pointsWinpiece = mu.comp_obj2note_point_set(coWinpiece)
@@ -224,12 +231,13 @@ coDirs.slice(3,4)
           tmp_pattern = tmp_pattern.map(function(pt){
             return[pt[0] - tmp_start_ontime, pt[1], pt[2], pt[3], 0, pt[5]]
           })
-        }
-        console.log("********retrivedOcc[i].winningPiece:", retrivedOcc[i].winningPiece)
-        let sim_score_convert = FingerprintingSimilarityScore(tmp_pattern, theme_pattern)
-        console.log("Converted sim score:", sim_score_convert)
-        if(sim_score_convert < minSimilarity){
-          flag_for_pattern_save = 1
+          // Only calculate convertSimScore when the excerpt is extracted from another song.
+          // console.log("********retrievedOcc[i].winningPiece:", retrievedOcc[i].winningPiece)
+          let sim_score_convert = FingerprintingSimilarityScore(tmp_pattern, theme_pattern)
+          // console.log("Converted sim score:", sim_score_convert)
+          if(sim_score_convert < minSimilarity){
+            flag_for_pattern_save = 1
+          }
         }
         // Run similarity calculation again to ensure the similarity between variations <= maxSimScore.
         // if (i === 0){
@@ -239,12 +247,16 @@ coDirs.slice(3,4)
         // else{
         pattern_to_be_saved.forEach(function(pn){
           let sim_score = FingerprintingSimilarityScore(tmp_pattern, pn["tmp_pattern"])
-          console.log("sim score:", sim_score)
-          if(sim_score >= maxSimilarity){
+          // console.log("sim score:", sim_score)
+          if(sim_score > maxSimilarity){
             flag_for_pattern_save = 1
           }
         })
         if(flag_for_pattern_save ===0){
+          if(retrievedOcc[i].winningPiece != currentSongNum){
+            cnt_from_diff_song ++
+            list_with_var_diff_song.push({"retrieved_from": retrievedOcc[i].winningPiece, "saved_name": currentSongNum + "_" + tmp_phrase_name + "_" + (pattern_to_be_saved.length)})
+          }
           pattern_to_be_saved.push({"tmp_pattern":tmp_pattern, "tmp_bpm":tmp_bpm})
           tmp_phrase_count ++
         }
@@ -305,7 +317,9 @@ coDirs.slice(3,4)
     }
   })
 })
-console.log("[Number of pattern pair saved]:", pair_cnt)
+console.log("[Number of pattern pairs saved]:", pair_cnt)
+console.log("[Number of pairs from different song]:", cnt_from_diff_song)
+console.log("list_with_var_diff_song", list_with_var_diff_song)
 
 function isLowerCase(ch){
   return ch >= 'a' && ch <= 'z'
@@ -368,7 +382,7 @@ function calculateOntimeDiff(co, annothationPath){
   const alignedMelody = fs.readFileSync(
     annothationPath
   ).toString()
-  console.log("Aligned Melody:", alignedMelody.split("\n")[0].slice(0, 3))
+  // console.log("Aligned Melody:", alignedMelody.split("\n")[0].slice(0, 3))
 
   let ontimeDiff = 0
 
@@ -446,7 +460,48 @@ function FingerprintingSimilarityScore(query, lookup){
   return interSim
 }
 
-// Retrive (in)exact occurrence of a pattern across the whole dataset.
+// Returning the 'edge' with the maxmal similarity.
+function FingerprintingMatchingEdge(query, lookup){
+  let h = new mh.HasherNoConcat()
+  const queryBegTime = Math.round(100000*(query[0][0]))/100000
+  let alignedQuery = query.map(function(pt){
+    return [Math.round(100000*(pt[0] - queryBegTime))/100000, pt[1]]
+  })
+
+  const buffre_lookup = alignedQuery[alignedQuery.length-1][0] + 1 // 100
+  const lookupBegTime = Math.round(100000*(lookup[0][0]))/100000
+  let alignedLookup = lookup.map(function(pt){
+    return [Math.round(100000*(pt[0] - lookupBegTime + buffre_lookup))/100000, pt[1]]
+  })
+  console.log("alignedLookup", lookup[0][0] - lookupBegTime)
+  const lookup_max_ontime = Math.ceil(alignedLookup[alignedLookup.length -  1][0])
+
+  const queLookupMatches = h.match_query_lookup_piece(
+    alignedLookup,
+    "lookup",
+    alignedQuery,
+    "triples",
+    fingerprinting_param.tMin,
+    fingerprinting_param.tMax,
+    fingerprinting_param.pMin,
+    fingerprinting_param.pMax,
+    lookup_max_ontime,
+    fingerprinting_param.binSize
+  )
+  // console.log("queLookupMatches", queLookupMatches)
+  // let interSim = 0
+  // if (queLookupMatches.countBins.length > 0){
+  //   interSim = Math.round(10000 * (queLookupMatches.countBins[0].setSize / queLookupMatches.uninosHashes)) / 100
+  // }
+  
+
+  // console.log("queLookupMatches.countBins[0].edge", queLookupMatches.countBins[0].edge)
+  let calculated_edge = queLookupMatches.countBins[0].edge - (buffre_lookup - lookupBegTime) - lookupBegTime + queryBegTime
+  calculated_edge = Math.floor(calculated_edge/1)
+  return calculated_edge
+}
+
+// Retrieve (in)exact occurrence of a pattern across the whole dataset.
 function ExtractAllOccurWholeDataset(MTP, maxSimRatio, minSimRatio, fname){
   // console.log("Calculate the number of exact/inexact occurrences of: ", fname)
   let h = new mh.HasherNoConcat()
@@ -471,7 +526,7 @@ function ExtractAllOccurWholeDataset(MTP, maxSimRatio, minSimRatio, fname){
   )
   let intraOcc = []
 
-  console.log("Unique hash count of query: ", matches.uninosHashes)
+  // console.log("Unique hash count of query: ", matches.uninosHashes)
   if (matches.uninosHashes >= fingerprinting_param.minUniqueHash) {
     const topResults = matches.countBins
     const fnamWithoutSuffix = fname.toString()
@@ -529,7 +584,7 @@ function ExtractAllOccurWholeDataset(MTP, maxSimRatio, minSimRatio, fname){
       }
 
     }
-    console.log("sel_edge", sel_edge)
+    // console.log("sel_edge", sel_edge)
     // console.log("Similar pattern occurrences: ", intraOcc)
   }
   return intraOcc
@@ -553,4 +608,142 @@ function checkOntimeSelfOverlap (integerPoints, vec){
     }
   }
   return flag
+}
+
+function inArray(search,array){
+  for(var i in array){
+      if(array[i]==search){
+          return true;
+      }
+  }
+  return false;
+}
+
+// Human annotations with similarity < maxSimilarity will be reserved as variations.
+function selectedAnnotatedVar(points, phraseLable, lengthArrag, tmp_phrase_name, current_tempo, beatsPerBar){
+  let pattern_to_be_saved = []
+  let theme_pattern
+  let tmp_phrase_count = 0
+
+  for(let i = 0; i < phraseLable.length; i ++){
+    let flag_for_pattern_save = 0
+    if(phraseLable[i] === tmp_phrase_name){
+      // Calculate start ontime.
+      const startBar = getStartBar(i, lengthArrag)
+      // console.log("****startBar", startBar)
+      // console.log("****ontimeDiff", ontimeDiff)
+      const tmp_start_ontime = (startBar - 1)*beatsPerBar
+      // console.log("tmp_start_ontime", tmp_start_ontime)
+      // Calculate end ontime.
+      const tmp_end_ontime = tmp_start_ontime + lengthArrag[i]*beatsPerBar
+      // console.log("tmp_end_ontime", tmp_end_ontime)
+      let tmp_pattern 
+      if(tmp_end_ontime < points[points.length - 1][0]){
+        tmp_pattern= slicePoints(points, tmp_start_ontime, tmp_end_ontime)[0]
+        // console.log("*****tmp_pattern:", tmp_pattern.slice(0,3))
+        // Align each phrases to star from ontime = 0.
+        // const beg_time = tmp_pattern[0][0]
+        tmp_pattern = tmp_pattern.map(function(pt){
+          return[pt[0] - tmp_start_ontime, pt[1], pt[2], pt[3], 0, pt[5]]
+        })
+
+        // Calculate similarity between the current pattern and the P_0
+        let sim_score = 100
+
+        if(tmp_phrase_count === 0){
+          theme_pattern = tmp_pattern
+          // console.log("selectedAnnotatedVar_theme_pattern", theme_pattern.slice(0,10))
+        }
+        if(tmp_phrase_count > 0){
+          // console.log("===Cal similarity:")
+          pattern_to_be_saved.forEach(function(pn){
+            sim_score = FingerprintingSimilarityScore(tmp_pattern, pn["tmp_pattern"])
+            // console.log("sim score:", sim_score)
+            if(sim_score > maxSimilarity){
+              flag_for_pattern_save = 1
+            }
+          })
+        }
+        if(flag_for_pattern_save === 0 || tmp_phrase_count === 0){
+          pattern_to_be_saved.push({"tmp_pattern":tmp_pattern, "tmp_bpm":current_tempo})
+          tmp_phrase_count ++
+        }
+      }
+      
+    } 
+  }
+  return pattern_to_be_saved
+}
+
+// Human annotations with similarity < maxSimilarity will be reserved as potential variations.
+// Then, run fp on the variation (lookup piece), and select the ontime with the highest fp score as the 
+// start time of the variation. 
+// Only accept the ontime with the highest fp score that appears at the first 1/3 of the variation.
+function selectedAnnotatedVarWithfp(points, phraseLable, lengthArrag, tmp_phrase_name, current_tempo, beatsPerBar){
+  let pattern_to_be_saved = []
+  let theme_pattern
+  let tmp_phrase_count = 0
+
+  for(let i = 0; i < phraseLable.length; i ++){
+    let flag_for_pattern_save = 0
+    if(phraseLable[i] === tmp_phrase_name){
+      // Calculate start ontime.
+      const startBar = getStartBar(i, lengthArrag)
+      // console.log("****startBar", startBar)
+      // console.log("****ontimeDiff", ontimeDiff)
+      const tmp_start_ontime = (startBar - 1)*beatsPerBar
+      // console.log("tmp_start_ontime", tmp_start_ontime)
+      // Calculate end ontime.
+      const tmp_end_ontime = tmp_start_ontime + lengthArrag[i]*beatsPerBar
+      // console.log("tmp_end_ontime", tmp_end_ontime)
+      let tmp_pattern 
+      if(tmp_end_ontime < points[points.length - 1][0]){
+        tmp_pattern= slicePoints(points, tmp_start_ontime, tmp_end_ontime)[0]
+        // console.log("*****tmp_pattern:", tmp_pattern.slice(0,3))
+        // Align each phrases to star from ontime = 0.
+        // const beg_time = tmp_pattern[0][0]
+        tmp_pattern = tmp_pattern.map(function(pt){
+          return[pt[0] - tmp_start_ontime, pt[1], pt[2], pt[3], 0, pt[5]]
+        })
+
+        // Calculate similarity between the current pattern and the P_0
+        let sim_score = 100
+
+        if(tmp_phrase_count === 0){
+          theme_pattern = tmp_pattern
+          // console.log("selectedAnnotatedVar_theme_pattern", theme_pattern.slice(0,10))
+        }
+        if(tmp_phrase_count > 0){
+          // console.log("===Cal similarity:")
+          // Run fingerprinting to get the ontime with the maximal similarity
+          let tmp_edge = FingerprintingMatchingEdge(tmp_pattern, theme_pattern)
+          console.log("tmp_edge", tmp_edge)
+          // console.log("lengthArrag[i]*beatsPerBar/3", lengthArrag[i]*beatsPerBar/3)
+          if(tmp_edge < lengthArrag[i]*beatsPerBar/3 && tmp_end_ontime+tmp_edge < points[points.length - 1][0]){
+            // slice the new variation according to the edge
+            tmp_pattern= slicePoints(points, tmp_start_ontime+tmp_edge, tmp_end_ontime+tmp_edge)[0]
+            tmp_pattern = tmp_pattern.map(function(pt){
+              return[pt[0] - (tmp_start_ontime+tmp_edge), pt[1], pt[2], pt[3], 0, pt[5]]
+            })
+            pattern_to_be_saved.forEach(function(pn){
+              sim_score = FingerprintingSimilarityScore(tmp_pattern, pn["tmp_pattern"])
+              // console.log("sim score:", sim_score)
+              if(sim_score > maxSimilarity){
+                flag_for_pattern_save = 1
+              }
+            })
+          }
+          else{
+            flag_for_pattern_save = 1
+          }
+        }
+        if(flag_for_pattern_save === 0 || tmp_phrase_count === 0){
+          pattern_to_be_saved.push({"tmp_pattern":tmp_pattern, "tmp_bpm":current_tempo})
+          tmp_phrase_count ++
+        }
+      }
+      
+    } 
+  }
+  return pattern_to_be_saved
 }
